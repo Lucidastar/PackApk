@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 Properties prop = new Properties()
 prop.load(new FileInputStream(file("../signing.properties")))
 
-def releaseTime() {
+def versionTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
 android {
@@ -14,7 +14,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
         flavorDimensions "versionCode"
     }
     signingConfigs {
@@ -32,6 +31,12 @@ android {
             storePassword prop['STORE_PASSWORD']
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -54,10 +59,15 @@ android {
 
             applicationVariants.all { variant ->
                 variant.outputs.all { output ->
+                    //==================================================================================
+                    //apk的输出路径  也可以注释掉这段  会默认输出路径
+                    variant.getPackageApplication().outputDirectory = new File(prop['APK_OUT_PATH'] + "/apk/release")
+                    //==================================================================================
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
                         // 输出apk名称为com_biniusports_app_bnsports_v1.0.0_20171205_baidu.apk
-                        def fileName = "lucidastar_package_v${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        //工程的名称  版本名 时间  平台名称
+                        def fileName = "${project.name}_v${defaultConfig.versionName}_${versionTime()}_${variant.productFlavors[0].name}.apk"
                         outputFileName = fileName
                     }
                 }
@@ -85,7 +95,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.umeng.sdk:common:latest.integration'
-    compile 'com.umeng.sdk:analytics:latest.integration'
+    implementation 'com.umeng.sdk:common:1.5.0'
+    implementation 'com.umeng.sdk:analytics:7.5.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
 }
