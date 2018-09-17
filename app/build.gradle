@@ -86,6 +86,17 @@ android {
         }
     }
 
+    tasks.whenTaskAdded { task ->
+        if (task.name.contains("lint")
+                || task.name.equals("clean")
+                || task.name.contains("mockableAndroidJar")
+                || task.name.contains("UnitTest")
+                || task.name.contains("AndroidTest")
+        ) {
+            task.enabled = false
+        }
+    }
+
 }
 
 dependencies {
