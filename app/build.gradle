@@ -58,25 +58,21 @@ android {
             signingConfig signingConfigs.release
 
             applicationVariants.all { variant ->
-                variant.outputs.all { output ->
-                    //==================================================================================
-                    //apk的输出路径  也可以注释掉这段  会默认输出路径
-                    variant.getPackageApplication().outputDirectory = new File(prop['APK_OUT_PATH'] + "/apk/release")
-                    //==================================================================================
-                    def outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        // 输出apk名称为com_biniusports_app_bnsports_v1.0.0_20171205_baidu.apk
-                        //工程的名称  版本名 时间  平台名称
-                        def fileName = "${project.name}_v${defaultConfig.versionName}_${versionTime()}_${variant.productFlavors[0].name}.apk"
-                        outputFileName = fileName
-                    }
+                variant.getPackageApplicationProvider().get().outputDirectory = new File(prop['APK_OUT_PATH'] + "/apk/release")
+                variant.getPackageApplicationProvider().get().outputScope.apkDatas.forEach { apkData ->
+                    def fileName = "${project.name}_v${defaultConfig.versionName}_${versionTime()}_${variant.productFlavors[0].name}.apk"
+                    apkData.outputFileName =  fileName
                 }
             }
         }
 
     }
 
+    flavorDimensions "type" //这个是必须的
     productFlavors {
+        apk{
+            dimension "type" //并且必须使用这个dimension
+        }
         wandoujia {}
         baidu {}
         c360 {}
